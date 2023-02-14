@@ -1,2 +1,2 @@
-add(X,Y):- Z is X+Y,
-            write(Z).
+add(X,Y):- A is X+Y,
+            write(A).
