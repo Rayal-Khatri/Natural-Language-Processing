@@ -56,4 +56,17 @@ append([],L2,L2).
 GOAL
 append([1,3,10],[3,4,5,6,7,8],X).
 
+DOMAINS
+list = integer*
+PREDICATES
+append(list,list,list)
+CLAUSES
+append([H|T],L2,L3):-
+	append(T,L2,L4),
+	L3 =[H|L4].
+append([],L2,L2).
+GOAL
+append([1,3,10],[3,4,5,6,7,8],X).
+
+
 
