@@ -67,6 +67,36 @@ append([H|T],L2,L3):-
 append([],L2,L2).
 GOAL
 append([1,3,10],[3,4,5,6,7,8],X).
+ 
+ 
+ DOMAINS
+list = integer*
 
+PREDICATES
+NONDETERM condition(integer)
+NONDETERM display(list)
+NONDETERM begin(list)
+
+CLAUSES
+condition(X):- 
+	X=1;X=2.
+
+begin(L):-
+	write("["), 
+	display(L).
+	
+display([H|T]):- 
+	condition(H), 
+	write(H), 
+	write(","), 
+	display(T).
+display([H|T]):- 
+	display(T).
+display([]):-
+	write("]"),
+	readint(X).
+
+GOAL
+begin([1,2,4,5,2,4,5,1,1]).
 
 
