@@ -99,4 +99,32 @@ display([]):-
 GOAL
 begin([1,2,4,5,2,4,5,1,1]).
 
+DOMAINS
+list = integer*
 
+PREDICATES
+NONDETERM condition(integer)
+NONDETERM display(list)
+NONDETERM begin(list)
+
+CLAUSES
+condition(X):- 
+	X=1;X=2.
+
+begin(L):-
+	write("["), 
+	display(L).
+	
+display([H|T]):- 
+	condition(H), 
+	write(H), 
+	write(","), 
+	display(T).
+display([H|T]):- 
+	display(T).
+display([]):-
+	write("]"),
+	readint(X).
+
+GOAL
+begin([1,2,4,5,2,4,5,1,1]).
