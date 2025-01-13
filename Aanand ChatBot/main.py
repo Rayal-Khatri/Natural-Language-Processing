@@ -92,8 +92,12 @@ def remove_from_order(parameters: dict, session_id: str):
         for item in food_item:
             if item in inprogress_orders[session_id]:
                 del inprogress_orders[session_id][item]
-        order_str = Generic_helper.get_str_from_food_dict(inprogress_orders[session_id])
-        fulfillment_text = f"So far you have {order_str} in your order. Any changes you'd like to make?"
+                order_str = Generic_helper.get_str_from_food_dict(inprogress_orders[session_id])
+                fulfillment_text = f"Removed sucessfully. So far you have {order_str} in your order. Any changes you'd like to make?"
+            else:
+                order_str = Generic_helper.get_str_from_food_dict(inprogress_orders[session_id])
+                fulfillment_text = f"{item} is not in your order. So far you have {order_str} in your order. Any changes you'd like to make?"
+
     else:
         fulfillment_text = "Please place an order to remove items from it."
     return JSONResponse(content={
@@ -117,3 +121,4 @@ def complete_order(parameters: dict, session_id: str):
     return JSONResponse(content={
         "fulfillmentText": fulfillment_text
     })
+
