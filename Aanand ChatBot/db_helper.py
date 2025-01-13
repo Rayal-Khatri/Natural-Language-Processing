@@ -1,11 +1,25 @@
 import mysql.connector
+import pymysql
+import os
+from dotenv import load_dotenv
+import logging
+
+load_dotenv()
+
 
 def get_db_connection():
-    return mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='Doramon9841',
-        database='pandeyji_eatery'
+    timeout = 10
+    return pymysql.connect(
+    charset="utf8mb4",
+    connect_timeout=timeout,
+    cursorclass=pymysql.cursors.DictCursor,
+    read_timeout=timeout,
+    db=os.getenv("DB_NAME"),
+    host=os.getenv("DB_HOST"),
+    password=os.getenv("DB_PASSWORD"),
+    port=int(os.getenv("DB_PORT")),
+    user=os.getenv("DB_USER"),
+    write_timeout=timeout,
     )
 
 def get_order_status(order_id):
@@ -16,19 +30,19 @@ def get_order_status(order_id):
         # Query to fetch the status
         query = "SELECT status FROM order_tracking WHERE order_id = %s"
         cursor.execute(query, (order_id,))
-        result = cursor.fetchone()
-        
-        if result:
-            return result[0]
+        result = cursor.fetchone()        
+        if result and 'status' in result:
+            return result['status']
         else:
             return None
-    except mysql.connector.Error as e:
+    except pymysql.MySQLError as e:
         return f"Error: {e}"
     finally:
-        if cursor:
-            cursor.close()
-        if connection.is_connected():
-            connection.close()
+        cursor.close()
+        connection.close()
+
+
+
 
 
 def save_to_db(order: dict):
@@ -48,29 +62,35 @@ def save_to_db(order: dict):
         return next_order_id
     except mysql.connector.Error as e:
         return f"Error: {e}"
-    
 
 def get_next_order_id():
     connection = get_db_connection()
+    cursor = None
     try:
         cursor = connection.cursor()
         
         # Fetch the maximum order_id from the orders table
         query = "SELECT MAX(order_id) FROM orders"
         cursor.execute(query)
-        result = cursor.fetchone()[0]
-        cursor.close()
-        if result is None:
+        result = cursor.fetchone()       
+        if result['MAX(order_id)'] is None:
             return 1
         else:
-            return result + 1
-    except mysql.connector.Error as e:
+            return result['MAX(order_id)'] + 1
+    except pymysql.MySQLError as e:
+        logging.error(f"Error fetching next order ID: {e}")
         return f"Error: {e}"
+    finally:
+        if cursor:
+            cursor.close()
+        connection.close()
     
+
 
 
 def insert_order_item(food_item, quantity, order_id):
     connection = get_db_connection()
+    cursor = None
     try:
         cursor = connection.cursor()
 
@@ -78,34 +98,25 @@ def insert_order_item(food_item, quantity, order_id):
         connection.commit()
         cursor.close()
         return 1
-        
-        # Insert the order item into the orders table
-        # query = "INSERT INTO orders (order_id, food_item, quantity) VALUES (%s, %s, %s)"
-        # cursor.execute(query, (order_id, food_item, quantity))
-        
-        # connection.commit()
+
     except mysql.connector.Error as e:
         print(f"Error: {e}")
         connection.rollback()
         return -1
-    
-
 
 def get_total_price(order_id):
-  connection = get_db_connection()
-  cursor = connection.cursor()
+    connection = get_db_connection()
+    cursor = connection.cursor()
 
-  # Executing the SQL query to get the total order price
-  query = f"SELECT get_total_order_price({order_id})"
-  cursor.execute(query)
+    # Executing the SQL query to get the total order price
+    query = f"SELECT get_total_order_price({order_id})"
+    cursor.execute(query)
 
-  # Fetching the result
-  result = cursor.fetchone()[0]
+    # Fetching the result
+    result = cursor.fetchone()
+    cursor.close()
 
-  # Closing the cursor
-  cursor.close()
-
-  return result
+    return result[f'get_total_order_price({order_id})']
 
 
 
@@ -123,3 +134,4 @@ def insert_order_tracking(order_id, status):
     # Closing the cursor
     cursor.close()
 
+print(get_total_price(41))
