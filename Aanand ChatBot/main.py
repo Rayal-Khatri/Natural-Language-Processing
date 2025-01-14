@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+# from fastapi.middleware.cors import CORSMiddleware
 import db_helper
 import logging
 import Generic_helper
@@ -8,7 +9,13 @@ app = FastAPI()
 
 inprogress_orders ={}
 
-
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],  # Adjust this to specify allowed origins
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
