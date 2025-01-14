@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+import uvicorn
 # from fastapi.middleware.cors import CORSMiddleware
 import db_helper
 import logging
@@ -129,3 +130,7 @@ def complete_order(parameters: dict, session_id: str):
         "fulfillmentText": fulfillment_text
     })
 
+if __name__ == "__main__":
+    config = uvicorn.Config("main:app", host = "0.0.0.0", port=8000, reload=True)
+    server = uvicorn.Server(config)
+    server.run()
