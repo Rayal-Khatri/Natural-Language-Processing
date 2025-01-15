@@ -111,14 +111,27 @@ def get_total_price(order_id):
     # Executing the SQL query to get the total order price
     query = f"SELECT get_total_order_price({order_id})"
     cursor.execute(query)
-
     # Fetching the result
     result = cursor.fetchone()
     cursor.close()
 
     return result[f'get_total_order_price({order_id})']
 
+def get_item_price(item_name):
+    connection = get_db_connection()
+    cursor = connection.cursor()
 
+    # Properly format the item_name as a string with quotes
+    query = f"SELECT get_price_for_item('{item_name}')"
+    cursor.execute(query)
+
+    # Fetching the result
+    result = cursor.fetchone()
+    cursor.close()
+
+    return result[f"get_price_for_item('{item_name}')"]
+
+# print(get_item_price("samosa"))
 
 def insert_order_tracking(order_id, status):
     connection = get_db_connection()
@@ -134,4 +147,3 @@ def insert_order_tracking(order_id, status):
     # Closing the cursor
     cursor.close()
 
-print(get_total_price(41))

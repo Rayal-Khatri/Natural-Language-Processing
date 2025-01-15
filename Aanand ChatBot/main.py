@@ -27,6 +27,8 @@ async def handle_request(request: Request):
         'order.add - context: ongoing-order': add_to_order,
         'order.remove - context: Ongoing-order': remove_from_order,
         'order-complete - context: Ongoing order': complete_order,
+        'Default-Welcome-Intent': Welcome,
+        'Price-inquiry': get_price,
         'track-order - context: ongoing-tracking': track_order
         }
     try:
@@ -128,6 +130,28 @@ def complete_order(parameters: dict, session_id: str):
         fulfillment_text = "Please place an order before completing it."
     return JSONResponse(content={
         "fulfillmentText": fulfillment_text
+    })
+
+def Welcome(parameters: dict, session_id: str):
+    return JSONResponse(content={})
+
+
+def get_price(parameters: dict, session_id: str):
+    food_items = parameters["food-item"]  # Assuming this is a list of items
+    prices = []
+
+    for item in food_items:
+        price = db_helper.get_item_price(item)
+        if price:
+            prices.append(f"The price for {item} is Rs. {int(price)}")
+        else:
+            prices.append(f"Price for {item} is not available")
+
+    # Join the individual responses into a single response text
+    response_text = " and ".join(prices)
+
+    return JSONResponse(content={
+        "fulfillmentText": response_text
     })
 
 if __name__ == "__main__":
